@@ -12,15 +12,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.Max;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/v1/resources")
@@ -36,24 +37,45 @@ public class FileController {
     }
 
     @RequestMapping(method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Mp3FileInformationDto> uploadFile(@RequestParam("file") MultipartFile file) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mp3FileInformationDto uploadFile(@RequestParam("file") MultipartFile file) {
         Mp3FileInformationDto mp3FileInformationDto = fileService.save(file);
-
         mp3FileInformationDto.setUrl(mp3FileUtil.createFileDownloadLink(mp3FileInformationDto.getId()));
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(mp3FileInformationDto);
+        return mp3FileInformationDto;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getFile(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getFile(@RequestHeader(value = "Range", required = false)
+                                              String rangeHeader, @PathVariable(value = "id")Long id) {
         Mp3FileDto mp3FileDto = fileService.getFileBy(id);
 
-        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + mp3FileDto.getName() + "\"")
+        return Objects.isNull(rangeHeader) ?
+                ResponseEntity.status(200)
                 .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
-                .body(mp3FileDto.getData());
+                .body(mp3FileDto.getData()) :
+                ResponseEntity.status(206)
+                .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
+                .headers(createHeadersForRangeRequest(mp3FileDto, rangeHeader))
+                .body(mp3FileUtil.createMp3Range(mp3FileDto, rangeHeader));
+
+    }
+
+    private HttpHeaders createHeadersForRangeRequest(Mp3FileDto mp3FileDto, String rangeHeader) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        String[] audioRange = mp3FileUtil.parseRangeHeader(rangeHeader);
+
+        int beginIndex = Integer.parseInt(audioRange[Constant.RANGE_BEGIN_ARRAY_INDEX]);
+        int endIndex = Integer.parseInt(audioRange[Constant.RANGE_END_ARRAY_INDEX]);
+        int rangeLength = endIndex - beginIndex + 1;
+
+        httpHeaders.add("Content-Type", Constant.AUDIO_FILE_CONTENT_TYPE);
+        httpHeaders.add("Content-Length", String.valueOf(rangeLength));
+        httpHeaders.add("Content-Range",   beginIndex + Constant.RANGE_SEPARATOR + endIndex
+                + "/" + mp3FileDto.getData().length);
+        return httpHeaders;
     }
 
     @RequestMapping(method = RequestMethod.DELETE,
@@ -62,19 +84,4 @@ public class FileController {
     public DeletedFilesDto removeFiles(@RequestParam(value = "id") @Max(200) String ids) {
         return fileService.delete(ids);
     }
-
-
-
-
-
-
-
-
-
-    //    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-//    @ResponseStatus(HttpStatus.OK)
-//    public ResponseEntity<String> getFile(@PathVariable String id) {
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body("hello world");
-//    }
 }
