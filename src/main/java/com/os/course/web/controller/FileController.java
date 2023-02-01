@@ -54,13 +54,19 @@ public class FileController {
 
         return Objects.isNull(rangeHeader) ?
                 ResponseEntity.status(200)
-                .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
-                .body(mp3FileDto.getData()) :
+                        .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
+                        .body(mp3FileDto.getData()) :
                 ResponseEntity.status(206)
-                .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
-                .headers(createHeadersForRangeRequest(mp3FileDto, rangeHeader))
-                .body(mp3FileUtil.createMp3Range(mp3FileDto, rangeHeader));
+                        .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
+                        .headers(createHeadersForRangeRequest(mp3FileDto, rangeHeader))
+                        .body(mp3FileUtil.createMp3Range(mp3FileDto, rangeHeader));
+    }
 
+    @RequestMapping(method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public DeletedFilesDto removeFiles(@RequestParam(value = "id") @Max(200) String ids) {
+        return fileService.delete(ids);
     }
 
     private HttpHeaders createHeadersForRangeRequest(Mp3FileDto mp3FileDto, String rangeHeader) {
@@ -76,12 +82,5 @@ public class FileController {
         httpHeaders.add("Content-Range",   beginIndex + Constant.RANGE_SEPARATOR + endIndex
                 + "/" + mp3FileDto.getData().length);
         return httpHeaders;
-    }
-
-    @RequestMapping(method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public DeletedFilesDto removeFiles(@RequestParam(value = "id") @Max(200) String ids) {
-        return fileService.delete(ids);
     }
 }

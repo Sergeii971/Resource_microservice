@@ -33,7 +33,7 @@ public class Mp3FileUtil {
     }
 
     private byte[] createCuttingAudio(Mp3FileDto mp3FileDto, int rangeLength, int beginIndex) {
-        byte [] result = new byte[rangeLength];
+        byte[] result = new byte[rangeLength];
 
         try(ByteArrayInputStream buffer = new ByteArrayInputStream(mp3FileDto.getData(), beginIndex, rangeLength)) {
             buffer.read(result);

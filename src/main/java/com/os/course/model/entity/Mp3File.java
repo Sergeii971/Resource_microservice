@@ -2,13 +2,11 @@ package com.os.course.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -23,8 +21,6 @@ public class Mp3File implements BaseEntity {
 
     private String name;
     private String contentType;
-    private Long size;
-    @Lob
-    private byte[] data;
+    private int size;
     private boolean deleted;
 }

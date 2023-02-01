@@ -24,6 +24,8 @@ public class Constant {
 
     public static final String AUDIO_FILE_CONTENT_TYPE = "audio/mpeg";
 
+    public static final String BUCKET_NAME = "mybucket";
+
     private Constant() {
     }
 }
