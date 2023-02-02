@@ -5,6 +5,8 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.Bucket;
+import com.os.course.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -26,4 +28,10 @@ public class S3Config {
                 .build();
 
     }
+
+//    TODO this apllication use aws emulator - localstack(docker image)
+//    @Bean
+//    public Bucket createBucket() {
+//        return getS3().createBucket(Constant.BUCKET_NAME);
+//    }
 }

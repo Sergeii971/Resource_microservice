@@ -47,7 +47,8 @@ public class FileController {
         return mp3FileInformationDto;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET,
+    produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> getFile(@RequestHeader(value = "Range", required = false)
                                               String rangeHeader, @PathVariable(value = "id")Long id) {
         Mp3FileDto mp3FileDto = fileService.getFileBy(id);

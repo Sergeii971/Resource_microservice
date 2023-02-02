@@ -1,5 +1,6 @@
 package com.os.course.util;
 
+import com.amazonaws.util.IOUtils;
 import com.os.course.model.dto.Mp3FileDto;
 import com.os.course.model.exception.IncorrectParameterValueException;
 import com.os.course.model.exception.ServerErrorException;
@@ -33,10 +34,11 @@ public class Mp3FileUtil {
     }
 
     private byte[] createCuttingAudio(Mp3FileDto mp3FileDto, int rangeLength, int beginIndex) {
-        byte[] result = new byte[rangeLength];
-
-        try(ByteArrayInputStream buffer = new ByteArrayInputStream(mp3FileDto.getData(), beginIndex, rangeLength)) {
-            buffer.read(result);
+        byte[] result;
+        byte[] data = mp3FileDto.getData();
+        try {
+            ByteArrayInputStream buffer = new ByteArrayInputStream(data, beginIndex, rangeLength);
+            result = IOUtils.toByteArray(buffer);
         } catch (Exception e) {
             throw new ServerErrorException(Constant.PARSING_FILE_EXCEPTION_MESSAGE);
         }

@@ -1,8 +1,9 @@
 package com.os.course.service.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import com.os.course.model.dto.DeletedFilesDto;
 import com.os.course.model.dto.Mp3FileDto;
 import com.os.course.model.dto.Mp3FileInformationDto;
@@ -90,25 +91,20 @@ public class FileServiceImpl implements FileService {
                 .orElseThrow(() -> new FileNotFoundException(Constant.FILE_NOT_FOUND_EXCEPTION_MESSAGE));
 
         S3Object s3Object = amazonS3.getObject(Constant.BUCKET_NAME, String.valueOf(id));
-        try {
-            byte[] fileByte = new byte[mp3FileDto.getSize()];
-            s3Object.getObjectContent().read(fileByte);
-            mp3FileDto.setData(fileByte);
+        try(S3ObjectInputStream stream = s3Object.getObjectContent()) {
+            mp3FileDto.setData(IOUtils.toByteArray(stream));
         } catch (IOException e) {
             throw new ServerErrorException(Constant.PARSING_FILE_EXCEPTION_MESSAGE);
         }
         return mp3FileDto;
     }
 
-    public Bucket createBucket(String bucketName) {
-        return amazonS3.createBucket(bucketName);
-    }
 
     private void uploadDocument(MultipartFile file, long id) throws IOException {
         String tempFileName = UUID.randomUUID() + file.getName();
         File tempFile = new File(System.getProperty("java.io.tmpdir") + "/" + tempFileName);
         file.transferTo(tempFile);
         amazonS3.putObject(Constant.BUCKET_NAME,  String.valueOf(id), tempFile);
-        tempFile.deleteOnExit();
+        tempFile.delete();
     }
 }
