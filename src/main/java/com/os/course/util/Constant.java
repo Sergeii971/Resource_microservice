@@ -26,6 +26,8 @@ public class Constant {
 
     public static final String BUCKET_NAME = "mybucket";
 
+    public static final String UPLOADING_MP3_TOPIC_NAME = "uploadingMp3";
+
     private Constant() {
     }
 }
