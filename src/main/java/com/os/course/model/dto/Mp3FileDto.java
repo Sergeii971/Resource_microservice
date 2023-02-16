@@ -8,5 +8,4 @@ public class Mp3FileDto implements BaseDto {
     private long id;
     private byte[] data;
     private String contentType;
-    private int size;
 }

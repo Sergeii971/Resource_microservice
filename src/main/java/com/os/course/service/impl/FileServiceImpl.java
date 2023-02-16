@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import com.os.course.model.dto.DeletedFilesDto;
 import com.os.course.model.dto.Mp3FileDto;
-import com.os.course.model.dto.Mp3FileInformationDto;
 import com.os.course.model.entity.Mp3File;
 import com.os.course.model.exception.FileNotFoundException;
 import com.os.course.model.exception.IncorrectParameterValueException;
@@ -18,14 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,21 +44,19 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public Mp3FileInformationDto save(MultipartFile file) {
+    public long save(MultipartFile file) {
         if (!Constant.AUDIO_FILE_CONTENT_TYPE.equals(file.getContentType())) {
             throw new IncorrectParameterValueException(Constant.INCORRECT_EXTENSION);
         }
         Mp3File mp3File = new Mp3File();
         try {
-            mp3File.setName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
             mp3File.setContentType(file.getContentType());
-            mp3File.setSize((int) file.getSize());
             mp3File = fileRepository.save(mp3File);
             uploadDocument(file, mp3File.getId());
         } catch (Exception e) {
             throw new IncorrectParameterValueException(Constant.PARSING_FILE_EXCEPTION_MESSAGE);
         }
-        return modelMapper.map(mp3File, Mp3FileInformationDto.class);
+        return mp3File.getId();
     }
 
     @Override
