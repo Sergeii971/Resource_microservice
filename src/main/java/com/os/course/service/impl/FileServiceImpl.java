@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import com.os.course.model.dto.DeletedFilesDto;
 import com.os.course.model.dto.Mp3FileDto;
+import com.os.course.model.dto.Mp3FileInformationDto;
 import com.os.course.model.entity.Mp3File;
 import com.os.course.model.exception.FileNotFoundException;
 import com.os.course.model.exception.IncorrectParameterValueException;
@@ -44,7 +45,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public long save(MultipartFile file) {
+    public Mp3FileInformationDto save(MultipartFile file) {
         if (!Constant.AUDIO_FILE_CONTENT_TYPE.equals(file.getContentType())) {
             throw new IncorrectParameterValueException(Constant.INCORRECT_EXTENSION);
         }
@@ -56,7 +57,7 @@ public class FileServiceImpl implements FileService {
         } catch (Exception e) {
             throw new IncorrectParameterValueException(Constant.PARSING_FILE_EXCEPTION_MESSAGE);
         }
-        return mp3File.getId();
+        return modelMapper.map(mp3File, Mp3FileInformationDto.class);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.os.course.web.controller;
 
 import com.os.course.model.dto.DeletedFilesDto;
 import com.os.course.model.dto.Mp3FileDto;
+import com.os.course.model.dto.Mp3FileInformationDto;
 import com.os.course.service.FileService;
 import com.os.course.service.KafkaService;
 import com.os.course.util.Constant;
@@ -43,10 +44,10 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void uploadFile(@RequestParam("file") MultipartFile file) {
-        Long id = fileService.save(file);
-        kafkaService.sendMp3MetaData(id);
-
+    public Mp3FileInformationDto uploadFile(@RequestParam("file") MultipartFile file) {
+        Mp3FileInformationDto mp3FileInformationDto = fileService.save(file);
+        kafkaService.sendMp3MetaData(mp3FileInformationDto.getId());
+        return mp3FileInformationDto;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,

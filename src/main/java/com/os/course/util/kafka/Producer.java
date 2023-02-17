@@ -6,10 +6,7 @@ import com.os.course.model.exception.KafkaProducingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-
-import java.net.ConnectException;
 
 @Slf4j
 @Component
@@ -23,7 +20,6 @@ public class Producer {
         this.objectMapper = objectMapper;
     }
 
-    @Retryable(value = ConnectException.class)
     public <T> void sendMessage(T t, String topicName) {
         try {
             String objectAsMessage = objectMapper.writeValueAsString(t);
