@@ -18,14 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,9 +51,7 @@ public class FileServiceImpl implements FileService {
         }
         Mp3File mp3File = new Mp3File();
         try {
-            mp3File.setName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
             mp3File.setContentType(file.getContentType());
-            mp3File.setSize((int) file.getSize());
             mp3File = fileRepository.save(mp3File);
             uploadDocument(file, mp3File.getId());
         } catch (Exception e) {

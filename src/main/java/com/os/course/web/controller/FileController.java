@@ -4,6 +4,7 @@ import com.os.course.model.dto.DeletedFilesDto;
 import com.os.course.model.dto.Mp3FileDto;
 import com.os.course.model.dto.Mp3FileInformationDto;
 import com.os.course.service.FileService;
+import com.os.course.service.KafkaService;
 import com.os.course.util.Constant;
 import com.os.course.util.Mp3FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,13 @@ public class FileController {
     private final FileService fileService;
     private final Mp3FileUtil mp3FileUtil;
 
+    private final KafkaService kafkaService;
+
     @Autowired
-    public FileController(FileService fileService, Mp3FileUtil mp3FileUtil) {
+    public FileController(FileService fileService, Mp3FileUtil mp3FileUtil, KafkaService kafkaService) {
         this.fileService = fileService;
         this.mp3FileUtil = mp3FileUtil;
+        this.kafkaService = kafkaService;
     }
 
     @RequestMapping(method = RequestMethod.POST,
@@ -42,8 +46,7 @@ public class FileController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mp3FileInformationDto uploadFile(@RequestParam("file") MultipartFile file) {
         Mp3FileInformationDto mp3FileInformationDto = fileService.save(file);
-        mp3FileInformationDto.setUrl(mp3FileUtil.createFileDownloadLink(mp3FileInformationDto.getId()));
-
+        kafkaService.sendMp3MetaData(mp3FileInformationDto.getId());
         return mp3FileInformationDto;
     }
 
@@ -52,7 +55,6 @@ public class FileController {
     public ResponseEntity<byte[]> getFile(@RequestHeader(value = "Range", required = false)
                                               String rangeHeader, @PathVariable(value = "id")Long id) {
         Mp3FileDto mp3FileDto = fileService.getFileBy(id);
-
         return Objects.isNull(rangeHeader) ?
                 ResponseEntity.status(200)
                         .contentType(MediaType.valueOf(mp3FileDto.getContentType()))
