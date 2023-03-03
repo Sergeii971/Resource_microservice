@@ -17,6 +17,7 @@ import com.os.course.util.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +36,9 @@ public class FileServiceImpl implements FileService {
     private final ModelMapper modelMapper;
 
     private final AmazonS3 amazonS3;
+
+    @Value("${bucket.name}")
+    public String BUCKET_NAME;
 
     @Autowired
     public FileServiceImpl(FileRepository fileRepository, ModelMapper modelMapper, AmazonS3 amazonS3) {
@@ -73,7 +77,7 @@ public class FileServiceImpl implements FileService {
                 .filter(mp3File -> !mp3File.isDeleted())
                 .peek(file -> file.setDeleted(true))
                 .map(fileRepository::save)
-                .peek(mp3File -> amazonS3.deleteObject(Constant.BUCKET_NAME, String.valueOf(mp3File.getId())))
+                .peek(mp3File -> amazonS3.deleteObject(BUCKET_NAME, String.valueOf(mp3File.getId())))
                 .map(Mp3File::getId)
                 .collect(Collectors.toList()));
 
@@ -86,7 +90,8 @@ public class FileServiceImpl implements FileService {
                 .map(file -> modelMapper.map(file, Mp3FileDto.class))
                 .orElseThrow(() -> new FileNotFoundException(Constant.FILE_NOT_FOUND_EXCEPTION_MESSAGE));
 
-        S3Object s3Object = amazonS3.getObject(Constant.BUCKET_NAME, String.valueOf(id));
+        S3Object s3Object = amazonS3.getObject(BUCKET_NAME, String.valueOf(id));
+
         try(S3ObjectInputStream stream = s3Object.getObjectContent()) {
             mp3FileDto.setData(IOUtils.toByteArray(stream));
         } catch (IOException e) {
@@ -100,7 +105,7 @@ public class FileServiceImpl implements FileService {
         String tempFileName = UUID.randomUUID() + file.getName();
         File tempFile = new File(System.getProperty("java.io.tmpdir") + "/" + tempFileName);
         file.transferTo(tempFile);
-        amazonS3.putObject(Constant.BUCKET_NAME,  String.valueOf(id), tempFile);
+        amazonS3.putObject(BUCKET_NAME,  String.valueOf(id), tempFile);
         tempFile.delete();
     }
 }
