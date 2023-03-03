@@ -1,5 +1,9 @@
 package com.os.course.util;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class Constant {
     public static final String FILE_NOT_FOUND_EXCEPTION_MESSAGE = "file not found";
     public static final String PARSING_FILE_EXCEPTION_MESSAGE = "error while parsing file";
@@ -24,7 +28,6 @@ public class Constant {
 
     public static final String AUDIO_FILE_CONTENT_TYPE = "audio/mpeg";
 
-    public static final String BUCKET_NAME = "mybucket";
 
     public static final String UPLOADING_MP3_TOPIC_NAME = "uploadingMp3";
 
