@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  resource_service_db:
+    image: 'postgres:14-alpine3.14'
+    container_name: 'resource_service_db'
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=mp3
+
+  app:
+    image: 'docker-spring-boot-postgres:latest'
+    container_name: 'resource_service'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_service_db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://resource_service_db:5432/mp3
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=12345678
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
