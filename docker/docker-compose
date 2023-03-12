@@ -10,12 +10,14 @@ services:
       - POSTGRES_PASSWORD=12345678
       - POSTGRES_DB=mp3
 
-  app:
+  resource_service:
     image: 'docker-spring-boot-postgres:latest'
     container_name: 'resource_service'
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - 8081:8081
     depends_on:
       - resource_service_db
     environment:
@@ -23,3 +25,28 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=12345678
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  song_service_db:
+      image: 'postgres:14-alpine3.14'
+      container_name: 'song_service_db'
+      restart: always
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=12345678
+        - POSTGRES_DB=song
+
+  song_service:
+      image: 'docker-spring-boot-postgres:latest'
+      container_name: 'song_service'
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+        - 8082:8082
+      depends_on:
+        - song_service_db
+      environment:
+        - SPRING_DATASOURCE_URL=jdbc:postgresql://song_service_db:5432/song
+        - SPRING_DATASOURCE_USERNAME=postgres
+        - SPRING_DATASOURCE_PASSWORD=12345678
+        - SPRING_JPA_HIBERNATE_DDL_AUTO=update
