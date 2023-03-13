@@ -1,4 +1,4 @@
-version: '2'
+version: '3.7'
 
 services:
   resource_service_db:
@@ -10,21 +10,36 @@ services:
       - POSTGRES_PASSWORD=12345678
       - POSTGRES_DB=mp3
 
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - HOSTNAME_EXTERNAL=localstack
+      - HOSTNAME=localstack
+      - S3_PORT_EXTERNAL=4566
+      - AWS_DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+
   resource_service:
     image: 'docker-spring-boot-postgres:latest'
     container_name: 'resource_service'
     build:
-      context: .
       dockerfile: Dockerfile
     ports:
-      - 8081:8081
+      - '8081:8081'
     depends_on:
       - resource_service_db
+      - localstack
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://resource_service_db:5432/mp3
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=12345678
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=foo
+      - AWS_SECRET_ACCESS_KEY=bar
+      - AWS_ENDPOINT=http://localstack:4566
+      - S3_QUEUE=http://localstack:4566/000000000000/my-queue.fifo
 
   song_service_db:
       image: 'postgres:14-alpine3.14'
@@ -42,7 +57,7 @@ services:
         context: .
         dockerfile: Dockerfile
       ports:
-        - 8082:8082
+        - '8082:8082'
       depends_on:
         - song_service_db
       environment:
@@ -50,3 +65,11 @@ services:
         - SPRING_DATASOURCE_USERNAME=postgres
         - SPRING_DATASOURCE_PASSWORD=12345678
         - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  resource_processor:
+    image: 'docker-spring-boot:latest'
+    container_name: 'resource_processor'
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - '8083:8083'
