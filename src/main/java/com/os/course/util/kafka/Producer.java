@@ -24,7 +24,7 @@ public class Producer {
         try {
             String objectAsMessage = objectMapper.writeValueAsString(t);
 
-            kafkaTemplate.send(topicName, objectAsMessage);
+            kafkaTemplate.send(topicName, objectAsMessage,  objectAsMessage);
             log.info("message produced {}", objectAsMessage);
         } catch (JsonProcessingException e) {
             throw new KafkaProducingException(e.getMessage());
