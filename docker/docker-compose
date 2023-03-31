@@ -30,8 +30,41 @@ services:
     links:
       - zookeeper:zookeeper
 
+  service-configuration:
+    build:
+      dockerfile: DockerServiceConfiguration
+    image: service-configuration
+    container_name: service-configuration
+    ports:
+      - "8888:8888"
+
+  eureka-server:
+    image: service_discovery.jar
+    container_name: service_discovery
+    build:
+      context: .
+      dockerfile: ServiceDiscovery
+    ports:
+      - "8761:8761"
+    env_file:
+      - environment/ServiceDiscovery.env
+
+  spring-cloud-gateway-service:
+    build:
+      dockerfile: DockerSpringCloudGateway
+    image: spring_cloud_gateway.jar
+    container_name: spring_cloud_gateway
+    ports:
+        - "8084:8084"
+    depends_on:
+      - resource-service
+      - song-service
+      - eureka-server
+    env_file:
+      - environment/springCloudGateway.env
+
   resource-service:
-    image: 'resource_service'
+    image: 'resource-service'
     container_name: 'resource-service'
     build:
       dockerfile: Dockerfile
@@ -41,6 +74,7 @@ services:
       - resource_service_db
       - localstack
       - kafka
+      - eureka-server
     env_file:
       - environment/resourceServiceEnvironment.env
 
@@ -52,7 +86,7 @@ services:
         - environment/songServiceDbEnvironment.env
 
   song-service:
-      image: 'song_service'
+      image: 'song-service'
       container_name: 'song-service'
       build:
         dockerfile: SongDockerFile
@@ -60,6 +94,7 @@ services:
         - '8082:8082'
       depends_on:
         - song_service_db
+        - eureka-server
       env_file:
         - environment/songServiceEnvironment.env
 
@@ -70,6 +105,7 @@ services:
       - kafka
       - song-service
       - resource-service
+      - service-configuration
     build:
       dockerfile: ProcessorDockerFile
     ports:

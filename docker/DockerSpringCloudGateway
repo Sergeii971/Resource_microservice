@@ -1,0 +1,4 @@
+FROM adoptopenjdk:11-jre-hotspot
+MAINTAINER spring_cloud_gateway
+COPY jar/spring_cloud_gateway-1.0-SNAPSHOT.jar spring_cloud_gateway.jar
+ENTRYPOINT ["java","-jar","/spring_cloud_gateway.jar"]

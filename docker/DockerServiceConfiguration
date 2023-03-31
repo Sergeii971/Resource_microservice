@@ -1,0 +1,4 @@
+FROM adoptopenjdk:11-jre-hotspot
+MAINTAINER service_configuration
+COPY jar/Service_Configuration-1.0-SNAPSHOT.jar service-configuration.jar
+ENTRYPOINT ["java","-jar","/service-configuration.jar"]
