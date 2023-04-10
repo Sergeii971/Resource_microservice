@@ -1,0 +1,4 @@
+FROM adoptopenjdk:11-jre-hotspot
+MAINTAINER storage-manager
+COPY jar/StorageManager-1.0-SNAPSHOT.jar storage-manager.jar
+ENTRYPOINT ["java","-jar","/storage-manager.jar"]

@@ -13,6 +13,7 @@ services:
     ports:
       - "4566:4566"
 
+
   zookeeper:
     image: elevy/zookeeper:latest
     container_name: zookeeper
@@ -60,8 +61,29 @@ services:
       - resource-service
       - song-service
       - eureka-server
+      - storage-manager
     env_file:
       - environment/springCloudGateway.env
+
+  storage-manager_db:
+    image: 'postgres:14-alpine3.14'
+    container_name: 'storage-manager_db'
+    restart: always
+    env_file:
+      - environment/StorageManagerDbEnvironment.env
+
+  storage-manager:
+    image: 'storage-manager'
+    container_name: 'storage-manager'
+    build:
+      dockerfile: StorageManager
+    ports:
+      - '8085:8085'
+    depends_on:
+      - storage-manager_db
+      - eureka-server
+    env_file:
+      - environment/StorageManagerEnvironment.env
 
   resource-service:
     image: 'resource-service'
@@ -77,6 +99,13 @@ services:
       - eureka-server
     env_file:
       - environment/resourceServiceEnvironment.env
+    command: >
+      "
+      sleep 10;
+      aws --endpoint-url http://localhost:4566 s3 mb s3://permanentbucket;
+      aws --endpoint-url http://localhost:4566 s3 mb s3://stagingbucket
+      "
+
 
   song_service_db:
       image: 'postgres:14-alpine3.14'
