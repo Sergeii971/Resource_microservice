@@ -1,7 +1,10 @@
 package com.os.course.util;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.os.course.model.dto.StorageDto;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class Constant {
@@ -30,6 +33,10 @@ public class Constant {
 
 
     public static final String UPLOADING_MP3_TOPIC_NAME = "uploadingMp3";
+
+    public static final String STORAGE_REQUEST_MAPPING = "/v1/storages/";
+
+    public static List<StorageDto> storageDtoCache = new ArrayList<>();
 
     private Constant() {
     }

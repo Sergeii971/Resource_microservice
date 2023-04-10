@@ -6,7 +6,6 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +18,6 @@ public class S3Config {
     @Autowired
     private AwsProperties awsProperties;
 
-    @Value("${bucket.name}")
-    public String BUCKET_NAME;
-
     @Bean
     public AmazonS3 getS3() {
         return AmazonS3ClientBuilder
@@ -32,10 +28,4 @@ public class S3Config {
                 .build();
 
     }
-
-////    TODO this apllication use aws emulator - localstack(docker image)
-//    @Bean
-//    public Bucket createBucket() {
-//        return getS3().createBucket(BUCKET_NAME);
-//    }
 }
