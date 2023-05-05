@@ -1,6 +1,47 @@
 version: '3.7'
 
 services:
+  elasticsearch:
+    image: elasticsearch:8.7.0
+    container_name: elasticsearch
+    env_file:
+      - environment/elasticsearch.env
+    ports:
+      - '9200:9200'
+
+  logstash:
+    image: logstash:8.7.0
+    container_name: logstash
+    build:
+      context: .
+      dockerfile: LogstashFile
+    volumes:
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: bind
+        source: /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log
+        target: /var/lib/docker/logstash/logs
+        read_only: true
+    env_file:
+      - environment/logstash.env
+    depends_on:
+      - elasticsearch
+    ports:
+     - "9600:9600"
+
+  kibana:
+    image: kibana:8.7.0
+    container_name: kibana
+    restart: always
+    ports:
+      - '5601:5601'
+    env_file:
+      - environment/kibana.env
+    depends_on:
+      - elasticsearch
+
   resource_service_db:
     image: 'postgres:14-alpine3.14'
     container_name: 'resource_service_db'
@@ -35,6 +76,8 @@ services:
     build:
       dockerfile: DockerServiceConfiguration
     image: service-configuration
+    volumes:
+      - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
     container_name: service-configuration
     ports:
       - "8888:8888"
@@ -47,6 +90,9 @@ services:
       dockerfile: ServiceDiscovery
     ports:
       - "8761:8761"
+    volumes:
+      - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
+
     env_file:
       - environment/ServiceDiscovery.env
 
@@ -55,6 +101,8 @@ services:
       dockerfile: DockerSpringCloudGateway
     image: spring_cloud_gateway.jar
     container_name: spring_cloud_gateway
+    volumes:
+      - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
     ports:
         - "8084:8084"
     depends_on:
@@ -82,6 +130,8 @@ services:
     depends_on:
       - storage-manager_db
       - eureka-server
+    volumes:
+      - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
     env_file:
       - environment/StorageManagerEnvironment.env
 
@@ -90,6 +140,8 @@ services:
     container_name: 'resource-service'
     build:
       dockerfile: Dockerfile
+    volumes:
+      - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
     ports:
       - '8081:8081'
     depends_on:
@@ -99,12 +151,11 @@ services:
       - eureka-server
     env_file:
       - environment/resourceServiceEnvironment.env
-    command: >
-      "
+    command:
       sleep 10;
       aws --endpoint-url http://localhost:4566 s3 mb s3://permanentbucket;
       aws --endpoint-url http://localhost:4566 s3 mb s3://stagingbucket
-      "
+
 
 
   song_service_db:
@@ -119,6 +170,8 @@ services:
       container_name: 'song-service'
       build:
         dockerfile: SongDockerFile
+      volumes:
+        - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
       ports:
         - '8082:8082'
       depends_on:
@@ -130,6 +183,8 @@ services:
   resource_processor:
     image: 'resource_processor.jar'
     container_name: 'resource_processor'
+    volumes:
+      - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
     depends_on:
       - kafka
       - song-service
