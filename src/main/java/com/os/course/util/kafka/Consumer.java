@@ -7,6 +7,7 @@ import com.os.course.model.dto.StorageType;
 import com.os.course.model.exception.KafkaProducingException;
 import com.os.course.service.FileService;
 import com.os.course.util.MicroserviceUtil;
+import com.os.course.util.security.AuthorizationHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,6 +16,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -30,12 +32,15 @@ public class Consumer {
 
     private final AmazonS3 amazonS3;
 
+    private final AuthorizationHeader authorizationHeader;
+
     @Autowired
-    public Consumer(FileService fileService, MicroserviceUtil microserviceUtil, ObjectMapper objectMapper, AmazonS3 amazonS3) {
+    public Consumer(FileService fileService, MicroserviceUtil microserviceUtil, ObjectMapper objectMapper, AmazonS3 amazonS3, AuthorizationHeader authorizationHeader) {
         this.fileService = fileService;
         this.microserviceUtil = microserviceUtil;
         this.objectMapper = objectMapper;
         this.amazonS3 = amazonS3;
+        this.authorizationHeader = authorizationHeader;
     }
 
 
@@ -45,7 +50,9 @@ public class Consumer {
             maxAttempts = 5)
     public void consumeIdOfUploadingFile(String message) {
         try {
-            Long resourceId = objectMapper.readValue(message, Long.class);
+            List<String> param = Arrays.asList(objectMapper.readValue(message, String[].class));
+            long resourceId = Long.parseLong(param.get(0));
+            authorizationHeader.setAuthorizationHeader(param.get(1));
             changeS3BucketDocument(resourceId);
         } catch (IOException e) {
             throw new KafkaProducingException(e.getMessage());

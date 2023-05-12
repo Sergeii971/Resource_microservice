@@ -2,10 +2,14 @@ package com.os.course.util;
 
 import com.os.course.model.dto.StorageDto;
 import com.os.course.model.dto.StorageType;
+import com.os.course.util.security.AuthorizationHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,12 +22,15 @@ import java.util.stream.Collectors;
 public class MicroserviceUtil {
     private final CircuitBreakerFactory circuitBreakerFactory;
 
+    private final AuthorizationHeader authorizationHeader;
+
     @Value("${gateway.server.url}")
     public String gatewayUrl;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public MicroserviceUtil(CircuitBreakerFactory circuitBreakerFactory) {
+    public MicroserviceUtil(CircuitBreakerFactory circuitBreakerFactory, AuthorizationHeader authorizationHeader) {
         this.circuitBreakerFactory = circuitBreakerFactory;
+        this.authorizationHeader = authorizationHeader;
     }
 
     public <T> T postObject(String url, T object, Class<T> responseType) {
@@ -34,10 +41,17 @@ public class MicroserviceUtil {
         return restTemplate.getForObject(url, responseType);
     }
 
+    public <T> T exchange(String url, Class<T> responseType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authorizationHeader.getAuthorizationHeader());
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, requestEntity, responseType).getBody();
+    }
+
     public StorageDto getStorageData(StorageType storageType) {
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("storageBreaker");
         List<StorageDto> storageDtoList = circuitBreaker.run(() -> Arrays.stream(
-                        getObject(gatewayUrl + Constant.STORAGE_REQUEST_MAPPING, StorageDto[].class))
+                        exchange(gatewayUrl + Constant.STORAGE_REQUEST_MAPPING, StorageDto[].class))
                 .collect(Collectors.toList()), throwable -> {
             log.error(throwable.getMessage() + ", will use storage data that got in last calling");
             return Constant.storageDtoCache;
@@ -49,7 +63,7 @@ public class MicroserviceUtil {
     public List<StorageDto> getStorageData() {
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("storageBreaker");
         List<StorageDto> storageDtoList = circuitBreaker.run(() -> Arrays.stream(
-                        getObject(gatewayUrl + Constant.STORAGE_REQUEST_MAPPING, StorageDto[].class))
+                        exchange(gatewayUrl + Constant.STORAGE_REQUEST_MAPPING, StorageDto[].class))
                 .collect(Collectors.toList()), throwable -> {
             log.error(throwable.getMessage() + ", will use storage data that got in last calling");
             return Constant.storageDtoCache;

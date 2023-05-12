@@ -1,0 +1,4 @@
+FROM adoptopenjdk:11-jre-hotspot
+MAINTAINER authorization-service
+COPY jar/Authorization-Server-1.0-SNAPSHOT.jar authorization-service.jar
+ENTRYPOINT ["java","-jar","/authorization-service.jar"]

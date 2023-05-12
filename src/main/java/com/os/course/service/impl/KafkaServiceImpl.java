@@ -6,6 +6,8 @@ import com.os.course.util.kafka.TopicName;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class KafkaServiceImpl implements KafkaService {
@@ -24,4 +26,8 @@ public class KafkaServiceImpl implements KafkaService {
         producer.sendMessage(id, topicName.getUploadingTopicName());
     }
 
+    @Override
+    public  void sendMp3MetaData(List<String> param) {
+        producer.sendMessage(param, topicName.getUploadingTopicName());
+    }
 }

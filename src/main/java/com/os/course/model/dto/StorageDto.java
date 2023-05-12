@@ -9,4 +9,14 @@ public class StorageDto implements BaseDto {
     private String bucketName;
 
     private String path;
+
+    public StorageDto() {
+    }
+
+    public StorageDto(long id, StorageType storageType, String bucketName, String path) {
+        this.id = id;
+        this.storageType = storageType;
+        this.bucketName = bucketName;
+        this.path = path;
+    }
 }
