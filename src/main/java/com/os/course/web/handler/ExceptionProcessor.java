@@ -3,6 +3,7 @@ package com.os.course.web.handler;
 import com.os.course.model.dto.ErrorDto;
 import com.os.course.model.exception.FileNotFoundException;
 import com.os.course.model.exception.IncorrectParameterValueException;
+import com.os.course.model.exception.KafkaCustomException;
 import com.os.course.model.exception.ServerErrorException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,11 @@ public class ExceptionProcessor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = ServerErrorException.class)
     public ResponseEntity<ErrorDto> handleServerErrorException(ServerErrorException exception) {
+        return new ResponseEntity<>(new ErrorDto(exception.getMessage(), INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = KafkaCustomException.class)
+    public ResponseEntity<ErrorDto> handleServerErrorException(KafkaCustomException exception) {
         return new ResponseEntity<>(new ErrorDto(exception.getMessage(), INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

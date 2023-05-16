@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.os.course.model.dto.StorageDto;
 import com.os.course.model.dto.StorageType;
-import com.os.course.model.exception.KafkaProducingException;
+import com.os.course.model.exception.KafkaCustomException;
 import com.os.course.service.FileService;
 import com.os.course.util.MicroserviceUtil;
 import com.os.course.util.security.AuthorizationHeader;
@@ -55,7 +55,7 @@ public class Consumer {
             authorizationHeader.setAuthorizationHeader(param.get(1));
             changeS3BucketDocument(resourceId);
         } catch (IOException e) {
-            throw new KafkaProducingException(e.getMessage());
+            throw new KafkaCustomException(e.getMessage());
         }
     }
 
