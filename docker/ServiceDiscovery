@@ -1,4 +1,4 @@
 FROM adoptopenjdk:11-jre-hotspot
-MAINTAINER service_discovery
-COPY jar/service_discovery-1.0-SNAPSHOT.jar service_discovery.jar
-ENTRYPOINT ["java","-jar","/service_discovery.jar"]
+MAINTAINER service-discovery
+COPY jar/service_discovery-1.0-SNAPSHOT.jar service-discovery.jar
+ENTRYPOINT ["java","-jar","/service-discovery.jar"]

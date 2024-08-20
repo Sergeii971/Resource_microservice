@@ -17,7 +17,7 @@ services:
       dockerfile: LogstashFile
     volumes:
       - type: bind
-        source: ./logstash/pipeline
+        source: /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/pipeline
         target: /usr/share/logstash/pipeline
         read_only: true
       - type: bind
@@ -42,9 +42,9 @@ services:
     depends_on:
       - elasticsearch
 
-  resource_service_db:
+  resource-service-db:
     image: 'postgres:14-alpine3.14'
-    container_name: 'resource_service_db'
+    container_name: 'resource-service-db'
     restart: always
     env_file:
       - environment/resourceServiceDbEnvironment.env
@@ -83,8 +83,8 @@ services:
       - "8888:8888"
 
   eureka-server:
-    image: service_discovery.jar
-    container_name: service_discovery
+    image: service-discovery
+    container_name: service-discovery
     build:
       context: .
       dockerfile: ServiceDiscovery
@@ -99,8 +99,8 @@ services:
   spring-cloud-gateway-service:
     build:
       dockerfile: DockerSpringCloudGateway
-    image: spring_cloud_gateway.jar
-    container_name: spring_cloud_gateway
+    image: spring-cloud-gateway
+    container_name: spring-cloud-gateway
     volumes:
       - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
     ports:
@@ -113,9 +113,9 @@ services:
     env_file:
       - environment/springCloudGateway.env
 
-  storage-manager_db:
+  storage-manager-db:
     image: 'postgres:14-alpine3.14'
-    container_name: 'storage-manager_db'
+    container_name: 'storage-manager-db'
     restart: always
     env_file:
       - environment/StorageManagerDbEnvironment.env
@@ -127,6 +127,8 @@ services:
       dockerfile: AuthorizationFile
     ports:
       - '8086:8086'
+    env_file:
+      - environment/Authorization.env
 
   storage-manager:
     image: 'storage-manager'
@@ -136,7 +138,7 @@ services:
     ports:
       - '8085:8085'
     depends_on:
-      - storage-manager_db
+      - storage-manager-db
       - eureka-server
       - authorization-service
     volumes:
@@ -154,7 +156,7 @@ services:
     ports:
       - '8081:8081'
     depends_on:
-      - resource_service_db
+      - resource-service-db
       - localstack
       - kafka
       - eureka-server
@@ -168,9 +170,9 @@ services:
 
 
 
-  song_service_db:
+  song-service-db:
       image: 'postgres:14-alpine3.14'
-      container_name: 'song_service_db'
+      container_name: 'song-service-db'
       restart: always
       env_file:
         - environment/songServiceDbEnvironment.env
@@ -185,13 +187,13 @@ services:
       ports:
         - '8082:8082'
       depends_on:
-        - song_service_db
+        - song-service-db
         - eureka-server
       env_file:
         - environment/songServiceEnvironment.env
 
   resource_processor:
-    image: 'resource_processor.jar'
+    image: 'resource-processor'
     container_name: 'resource_processor'
     volumes:
       - /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log:/log
