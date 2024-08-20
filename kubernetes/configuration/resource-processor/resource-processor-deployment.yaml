@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: resource-processor
+  namespace: course
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-processor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: resource-processor
+    spec:
+      containers:
+        - name: resource-processor
+          image: resource-processor:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: resource-processor-config
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

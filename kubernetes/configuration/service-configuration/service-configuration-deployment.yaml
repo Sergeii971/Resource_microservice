@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: service-configuration
+  namespace: course
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-configuration
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: service-configuration
+    spec:
+      containers:
+        - name: service-configuration
+          image: service-configuration:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8888
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: service-configuration-config
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

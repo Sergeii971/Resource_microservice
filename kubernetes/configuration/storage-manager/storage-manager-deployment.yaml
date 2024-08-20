@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: storage-manager
+  namespace: course
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storage-manager
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: storage-manager
+    spec:
+      containers:
+        - name: storage-manager
+          image: storage-manager:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: storage-manager-config
+            - secretRef:
+                name: storage-manager-secret
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

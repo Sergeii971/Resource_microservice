@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: service-discovery
+  namespace: course
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-discovery
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: service-discovery
+    spec:
+      containers:
+        - name: service-discovery
+          image: service-discovery:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8761
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: service-discovery-config
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

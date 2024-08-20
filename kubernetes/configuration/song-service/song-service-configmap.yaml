@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: song-service-config
+data:
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  eureka.client.serviceUrl.defaultZone: http://service-discovery:8761/eureka

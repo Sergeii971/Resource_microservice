@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: spring-cloud-gateway-service
+  namespace: course
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-cloud-gateway-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: spring-cloud-gateway-service
+    spec:
+      containers:
+        - name: spring-cloud-gateway
+          image: spring-cloud-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: spring-cloud-gateway-service-config
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resource-processor-config
+data:
+  spring.cloud.config.uri: http://service-configuration:8888
+  spring.kafka.bootstrap_servers: kafka:9092
+  spring.kafka.server: kafka:9092
+  spring.profiles.active: docker

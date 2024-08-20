@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resource-service-config
+data:
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  aws.setup.region: us-east-1
+  aws.setup.accessKey: foo
+  aws.setup.secretKey: bar
+  aws.setup.endpoint: http://localstack:4566
+  S3_QUEUE: http://localstack:4566/000000000000/my-queue.fifo
+  spring_kafka_server: kafka:9092
+  eureka.client.serviceUrl.defaultZone: http://service-discovery:8761/eureka
+  gateway.server.url: http://spring-cloud-gateway-service:8084
+  spring.kafka.bootstrap_servers: kafka:9092

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: song-service-db
+  namespace: course
+spec:
+  serviceName: "song-service-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: song-service-db
+  template:
+    metadata:
+      labels:
+        app: song-service-db
+    spec:
+      containers:
+        - name: song-service-db
+          image: postgres:14-alpine3.14
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: song-service-db-secret

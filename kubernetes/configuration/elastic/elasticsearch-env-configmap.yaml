@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-config
+data:
+  ES_JAVA_OPTS: -Xmx256m -Xms256m
+  discovery.type: single-node
+  xpack.security.enabled: "false"

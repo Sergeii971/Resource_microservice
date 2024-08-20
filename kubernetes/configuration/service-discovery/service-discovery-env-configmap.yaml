@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-discovery-config
+data:
+  application.properties: |
+    eureka.client.serviceUrl.defaultZone=http://service-discovery:8761/eureka/

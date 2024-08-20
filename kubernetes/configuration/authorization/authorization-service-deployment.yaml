@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authorization-service
+  namespace: course
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authorization-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: authorization-service
+    spec:
+      containers:
+        - name: authorization-service
+          image: authorization-service:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: authorization-service-config
+          ports:
+            - containerPort: 8086
+              protocol: TCP
+
