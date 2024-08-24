@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: zookeeper
+  namespace: course
 spec:
   replicas: 1
   selector:
@@ -15,6 +16,7 @@ spec:
       containers:
         - name: zookeeper
           image: elevy/zookeeper:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 2181
               protocol: TCP

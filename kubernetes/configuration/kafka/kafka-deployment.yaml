@@ -16,6 +16,7 @@ spec:
       containers:
         - name: kafka
           image: wurstmeister/kafka:latest
+          imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: kafka-config

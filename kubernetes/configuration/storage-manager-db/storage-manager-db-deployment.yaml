@@ -24,3 +24,21 @@ spec:
           envFrom:
             - secretRef:
                 name: storage-manager-db-secret
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10

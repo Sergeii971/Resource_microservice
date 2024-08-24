@@ -27,6 +27,22 @@ spec:
           envFrom:
             - configMapRef:
                 name: spring-cloud-gateway-service-config
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            initialDelaySeconds: 300
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            initialDelaySeconds: 300
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
           volumeMounts:
             - mountPath: /log
               name: logs

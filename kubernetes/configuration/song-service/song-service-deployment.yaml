@@ -29,6 +29,22 @@ spec:
                 name: song-service-config
             - secretRef:
                 name: song-service-secret
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 400
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8082
+            initialDelaySeconds: 400
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
           volumeMounts:
             - mountPath: /log
               name: logs
