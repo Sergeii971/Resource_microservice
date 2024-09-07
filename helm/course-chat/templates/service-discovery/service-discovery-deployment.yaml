@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: service-discovery
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.serviceDiscovery.replicaCount }}
+  selector:
+    matchLabels:
+      app: service-discovery
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: service-discovery
+    spec:
+      containers:
+        - name: service-discovery
+          image: "{{ .Values.serviceDiscovery.image.repository }}:{{ .Values.serviceDiscovery.image.tag }}"
+          imagePullPolicy: {{ .Values.serviceDiscovery.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.serviceDiscovery.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: service-discovery-config
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.serviceDiscovery.service.port }}
+            initialDelaySeconds: 300
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.serviceDiscovery.service.port }}
+            initialDelaySeconds: 300
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

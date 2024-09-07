@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: resource-service
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - protocol: TCP
+      port: {{ .Values.resourceService.service.port }}
+      targetPort: {{ .Values.resourceService.service.port }}
+  type: {{ .Values.resourceService.service.type }}
+  selector:
+    app: resource-service

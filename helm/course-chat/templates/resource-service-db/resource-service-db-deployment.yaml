@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: resource-service-db
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  serviceName: "resource-service-db"
+  replicas: {{ .Values.resourceServiceDb.replicaCount }}
+  selector:
+    matchLabels:
+      app: resource-service-db
+  template:
+    metadata:
+      labels:
+        app: resource-service-db
+    spec:
+      containers:
+        - name: resource-service-db
+          image: "{{ .Values.resourceServiceDb.image.repository }}:{{ .Values.resourceServiceDb.image.tag }}"
+          imagePullPolicy: {{ .Values.resourceServiceDb.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.resourceServiceDb.service.port }}
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: resource-service-db-secret
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10

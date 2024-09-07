@@ -1,0 +1,174 @@
+authorizationService:
+  replicaCount: 1
+  image:
+    repository: authorization-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8086
+
+elasticsearch:
+  replicaCount: 1
+  image:
+    repository: elasticsearch
+    tag: "8.7.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 9200
+
+kafka:
+  replicaCount: 1
+  image:
+    repository: wurstmeister/kafka
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 9092
+
+kibana:
+  replicaCount: 1
+  image:
+    repository: kibana
+    tag: "8.7.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 5601
+
+localstack:
+  replicaCount: 1
+  image:
+    repository: localstack/localstack
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 4566
+
+logstash:
+  replicaCount: 1
+  image:
+    repository: logstash
+    tag: "8.7.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 9600
+
+resourceProcessor:
+  replicaCount: 1
+  image:
+    repository: resource-processor
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8083
+
+resourceService:
+  replicaCount: 1
+  image:
+    repository: resource-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8081
+
+resourceServiceDb:
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: "14-alpine3.14"
+    pullPolicy: IfNotPresent
+  service:
+    clusterIP: None
+    port: 5432
+
+serviceConfiguration:
+  replicaCount: 1
+  image:
+    repository: service-configuration
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8888
+
+serviceDiscovery:
+  replicaCount: 1
+  image:
+    repository: service-discovery
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8761
+
+
+songService:
+  replicaCount: 1
+  image:
+    repository: song-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8082
+
+songServiceDb:
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: "14-alpine3.14"
+    pullPolicy: IfNotPresent
+  service:
+    clusterIP: None
+    port: 5432
+
+springCloudGatewayService:
+  replicaCount: 1
+  image:
+    repository: spring-cloud-gateway
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8084
+
+storageManager:
+  replicaCount: 1
+  image:
+    repository: storage-manager
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8085
+
+storageManagerDb:
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: "14-alpine3.14"
+    pullPolicy: IfNotPresent
+  service:
+    clusterIP: None
+    port: 5432
+
+
+zookeeper:
+  replicaCount: 1
+  image:
+    repository: elevy/zookeeper
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    clusterIP: None
+    port: 2181
+
+namespace: course
+

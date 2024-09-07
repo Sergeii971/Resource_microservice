@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: spring-cloud-gateway-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.springCloudGatewayService.replicaCount }}
+  selector:
+    matchLabels:
+      app: spring-cloud-gateway-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: spring-cloud-gateway-service
+    spec:
+      containers:
+        - name: spring-cloud-gateway
+          image: "{{ .Values.springCloudGatewayService.image.repository }}:{{ .Values.springCloudGatewayService.image.tag }}"
+          imagePullPolicy: {{ .Values.springCloudGatewayService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.springCloudGatewayService.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: spring-cloud-gateway-service-config
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.springCloudGatewayService.service.port }}
+            initialDelaySeconds: 300
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.springCloudGatewayService.service.port }}
+            initialDelaySeconds: 300
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

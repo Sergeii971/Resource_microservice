@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: song-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.songService.replicaCount }}
+  selector:
+    matchLabels:
+      app: song-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: song-service
+    spec:
+      containers:
+        - name: song-service
+          image: "{{ .Values.songService.image.repository }}:{{ .Values.songService.image.tag }}"
+          imagePullPolicy: {{ .Values.songService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.songService.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: song-service-config
+            - secretRef:
+                name: song-service-secret
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.songService.service.port }}
+            initialDelaySeconds: 400
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.songService.service.port }}
+            initialDelaySeconds: 400
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

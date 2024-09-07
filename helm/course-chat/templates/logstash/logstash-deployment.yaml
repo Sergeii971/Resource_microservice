@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.logstash.replicaCount }}
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: "{{ .Values.logstash.image.repository }}:{{ .Values.logstash.image.tag }}"
+          imagePullPolicy: {{ .Values.logstash.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.logstash.service.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: logstash-config-volume
+              mountPath: /usr/share/logstash/pipeline/logstash.conf
+              subPath: logstash.conf
+              readOnly: true
+            - mountPath: /var/lib/docker/logstash/logs
+              name: logs
+              readOnly: true
+          command: ["/usr/share/logstash/bin/logstash", "-f", "/usr/share/logstash/pipeline/logstash.conf"]
+      restartPolicy: Always
+      volumes:
+        - name: logstash-config-volume
+          configMap:
+            name: logstash-config
+        - name: logs
+          hostPath:
+            path: /Users/Siarhei_Viarbouski/microservices/Resource service/docker/logstash/log

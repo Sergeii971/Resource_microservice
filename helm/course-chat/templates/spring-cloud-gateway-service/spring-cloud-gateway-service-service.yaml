@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-cloud-gateway-service
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.springCloudGatewayService.service.type }}
+  selector:
+    app: spring-cloud-gateway-service
+  ports:
+    - protocol: TCP
+      port: {{ .Values.springCloudGatewayService.service.port }}
+      targetPort: {{ .Values.springCloudGatewayService.service.port }}

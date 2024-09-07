@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: service-configuration
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.serviceConfiguration.replicaCount }}
+  selector:
+    matchLabels:
+      app: service-configuration
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: service-configuration
+    spec:
+      containers:
+        - name: service-configuration
+          image: "{{ .Values.serviceConfiguration.image.repository }}:{{ .Values.serviceConfiguration.image.tag }}"
+          imagePullPolicy: {{ .Values.serviceConfiguration.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.serviceConfiguration.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: service-configuration-config
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.serviceConfiguration.service.port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.serviceConfiguration.service.port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc

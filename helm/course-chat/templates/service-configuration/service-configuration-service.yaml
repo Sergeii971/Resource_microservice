@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-configuration
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - protocol: TCP
+      port: {{ .Values.serviceConfiguration.service.port }}
+      targetPort: {{ .Values.serviceConfiguration.service.port }}
+  type: {{ .Values.serviceConfiguration.service.type }}
+  selector:
+    app: service-configuration

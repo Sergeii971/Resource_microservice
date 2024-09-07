@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-manager-config
+  namespace: {{ .Values.namespace }}
+data:
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  eureka.client.serviceUrl.defaultZone: http://service-discovery:8761/eureka
+  security.oauth2.resource.user_info_uri: http://spring-cloud-gateway-service:8084/api/auth/user

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authorization-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.authorizationService.replicaCount }}
+  selector:
+    matchLabels:
+      app: authorization-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: authorization-service
+        date: {{ include "chart.labels.currentDate" . }}
+        version: {{ include "chart.labels.version" . }}
+    spec:
+      containers:
+        - name: authorization-service
+          image: "{{ .Values.authorizationService.image.repository }}:{{ .Values.authorizationService.image.tag }}"
+          imagePullPolicy: {{ .Values.authorizationService.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: authorization-service-config
+          ports:
+            - containerPort: {{ .Values.authorizationService.service.port }}
+              protocol: TCP
+

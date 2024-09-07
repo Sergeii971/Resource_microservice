@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: song-service-db
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  serviceName: "song-service-db"
+  replicas: {{ .Values.songServiceDb.replicaCount }}
+  selector:
+    matchLabels:
+      app: song-service-db
+  template:
+    metadata:
+      labels:
+        app: song-service-db
+    spec:
+      containers:
+        - name: song-service-db
+          image: "{{ .Values.songServiceDb.image.repository }}:{{ .Values.songServiceDb.image.tag }}"
+          imagePullPolicy: {{ .Values.songServiceDb.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.songServiceDb.service.port }}
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: song-service-db-secret
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10

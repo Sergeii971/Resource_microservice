@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: storage-manager-db
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  serviceName: "storage-manager-db"
+  replicas: {{ .Values.storageManagerDb.replicaCount }}
+  selector:
+    matchLabels:
+      app: storage-manager-db
+  template:
+    metadata:
+      labels:
+        app: storage-manager-db
+    spec:
+      containers:
+        - name: storage-manager-db
+          image: "{{ .Values.storageManagerDb.image.repository }}:{{ .Values.storageManagerDb.image.tag }}"
+          imagePullPolicy: {{ .Values.storageManagerDb.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.storageManagerDb.service.port }}
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: storage-manager-db-secret
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  psql -w -U "$POSTGRES_USERNAME" -d "$POSTGRES_DB" -c "SELECT 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10

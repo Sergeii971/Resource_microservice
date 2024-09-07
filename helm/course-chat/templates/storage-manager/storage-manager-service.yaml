@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage-manager
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - protocol: TCP
+      port: {{ .Values.storageManager.service.port }}
+      targetPort: {{ .Values.storageManager.service.port }}
+  type: {{ .Values.storageManager.service.type }}
+  selector:
+    app: storage-manager

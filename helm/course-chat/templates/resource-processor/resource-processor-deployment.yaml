@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: resource-processor
+  namespace: {{ .Values.namespace }}
+  labels:
+    date: {{ include "chart.labels.currentDate" . }}
+    version: {{ include "chart.labels.version" . }}
+spec:
+  replicas: {{ .Values.resourceProcessor.replicaCount }}
+  selector:
+    matchLabels:
+      app: resource-processor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: resource-processor
+    spec:
+      containers:
+        - name: resource-processor
+          image: "{{ .Values.resourceProcessor.image.repository }}:{{ .Values.resourceProcessor.image.tag }}"
+          imagePullPolicy: {{ .Values.resourceProcessor.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.resourceProcessor.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: resource-processor-config
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            initialDelaySeconds: 400
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 7
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8083
+            initialDelaySeconds: 400
+            timeoutSeconds: 50
+            periodSeconds: 50
+            failureThreshold: 7
+          volumeMounts:
+            - mountPath: /log
+              name: logs
+      restartPolicy: "Always"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logstash-pvc
