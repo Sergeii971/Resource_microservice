@@ -5,8 +5,10 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - protocol: TCP
+    - name: "song-service-db-port"
+      protocol: TCP
       port: {{ .Values.songServiceDb.service.port }}
-  clusterIP: {{ .Values.songServiceDb.service.clusterIP }}
+      targetPort: {{ .Values.songServiceDb.service.targetPort }}
+  type: {{ .Values.songServiceDb.service.clusterIP }}
   selector:
     app: song-service-db

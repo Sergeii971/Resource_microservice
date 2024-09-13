@@ -5,9 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - protocol: TCP
+    - name: "zookeeper-port"
       port: {{ .Values.zookeeper.service.port }}
-      targetPort: {{ .Values.zookeeper.service.port }}
+      targetPort: {{ .Values.zookeeper.service.targetPort }}
   type: {{ .Values.zookeeper.service.type }}
   selector:
     app: zookeeper

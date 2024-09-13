@@ -25,7 +25,7 @@ spec:
           image: "{{ .Values.serviceConfiguration.image.repository }}:{{ .Values.serviceConfiguration.image.tag }}"
           imagePullPolicy: {{ .Values.serviceConfiguration.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.serviceConfiguration.service.port }}
+            - containerPort: {{ .Values.serviceConfiguration.service.targetPort }}
               protocol: TCP
           envFrom:
             - configMapRef:
@@ -33,7 +33,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.serviceConfiguration.service.port }}
+              port: {{ .Values.serviceConfiguration.service.targetPort }}
             initialDelaySeconds: 30
             timeoutSeconds: 50
             periodSeconds: 50
@@ -41,7 +41,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: {{ .Values.serviceConfiguration.service.port }}
+              port: {{ .Values.serviceConfiguration.service.targetPort }}
             initialDelaySeconds: 30
             timeoutSeconds: 50
             periodSeconds: 50

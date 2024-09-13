@@ -25,7 +25,7 @@ spec:
           image: "{{ .Values.storageManager.image.repository }}:{{ .Values.storageManager.image.tag }}"
           imagePullPolicy: {{ .Values.storageManager.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.storageManager.service.port }}
+            - containerPort: {{ .Values.storageManager.service.targetPort }}
               protocol: TCP
           envFrom:
             - configMapRef:

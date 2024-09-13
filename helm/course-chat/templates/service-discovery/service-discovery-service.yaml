@@ -5,9 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - protocol: TCP
+    - name: "service-discovery-port"
       port: {{ .Values.serviceDiscovery.service.port }}
-      targetPort: {{ .Values.serviceDiscovery.service.port }}
+      targetPort: {{ .Values.serviceDiscovery.service.targetPort }}
   type: {{ .Values.serviceDiscovery.service.type }}
   selector:
     app: service-discovery

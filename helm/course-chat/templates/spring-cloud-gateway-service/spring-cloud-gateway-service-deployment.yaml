@@ -25,7 +25,7 @@ spec:
           image: "{{ .Values.springCloudGatewayService.image.repository }}:{{ .Values.springCloudGatewayService.image.tag }}"
           imagePullPolicy: {{ .Values.springCloudGatewayService.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.springCloudGatewayService.service.port }}
+            - containerPort: {{ .Values.springCloudGatewayService.service.targetPort }}
               protocol: TCP
           envFrom:
             - configMapRef:
@@ -33,7 +33,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.springCloudGatewayService.service.port }}
+              port: {{ .Values.springCloudGatewayService.service.targetPort }}
             initialDelaySeconds: 300
             timeoutSeconds: 50
             periodSeconds: 50
@@ -41,7 +41,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: {{ .Values.springCloudGatewayService.service.port }}
+              port: {{ .Values.springCloudGatewayService.service.targetPort }}
             initialDelaySeconds: 300
             timeoutSeconds: 50
             periodSeconds: 50

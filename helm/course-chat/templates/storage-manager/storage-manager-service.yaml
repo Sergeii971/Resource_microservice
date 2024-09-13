@@ -7,7 +7,7 @@ spec:
   ports:
     - protocol: TCP
       port: {{ .Values.storageManager.service.port }}
-      targetPort: {{ .Values.storageManager.service.port }}
+      targetPort: {{ .Values.storageManager.service.targetPort }}
   type: {{ .Values.storageManager.service.type }}
   selector:
     app: storage-manager

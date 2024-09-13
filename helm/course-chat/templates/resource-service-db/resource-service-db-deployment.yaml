@@ -22,7 +22,7 @@ spec:
           image: "{{ .Values.resourceServiceDb.image.repository }}:{{ .Values.resourceServiceDb.image.tag }}"
           imagePullPolicy: {{ .Values.resourceServiceDb.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.resourceServiceDb.service.port }}
+            - containerPort: {{ .Values.resourceServiceDb.service.targetPort }}
               protocol: TCP
           envFrom:
             - secretRef:

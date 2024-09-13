@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: service-discovery-config
-  namespace: course
+  namespace: {{ .Values.namespace }}
 data:
   application.properties: |
     eureka.client.serviceUrl.defaultZone=http://service-discovery:8761/eureka/

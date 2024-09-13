@@ -5,8 +5,10 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - protocol: TCP
+    - name: "storage-manager-db-port"
+      protocol: TCP
       port: {{ .Values.storageManagerDb.service.port }}
-  clusterIP: {{ .Values.storageManagerDb.service.clusterIP }}
+      targetPort: {{ .Values.storageManagerDb.service.targetPort }}
+  type: {{ .Values.storageManagerDb.service.clusterIP }}
   selector:
     app: storage-manager-db

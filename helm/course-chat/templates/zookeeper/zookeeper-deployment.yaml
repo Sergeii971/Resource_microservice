@@ -21,5 +21,5 @@ spec:
           image: "{{ .Values.zookeeper.image.repository }}:{{ .Values.zookeeper.image.tag }}"
           imagePullPolicy: {{ .Values.zookeeper.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.zookeeper.service.port }}
+            - containerPort: {{ .Values.zookeeper.service.targetPort }}
               protocol: TCP

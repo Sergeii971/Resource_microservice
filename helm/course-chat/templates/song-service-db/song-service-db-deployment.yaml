@@ -22,7 +22,7 @@ spec:
           image: "{{ .Values.songServiceDb.image.repository }}:{{ .Values.songServiceDb.image.tag }}"
           imagePullPolicy: {{ .Values.songServiceDb.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.songServiceDb.service.port }}
+            - containerPort: {{ .Values.songServiceDb.service.targetPort }}
               protocol: TCP
           envFrom:
             - secretRef:

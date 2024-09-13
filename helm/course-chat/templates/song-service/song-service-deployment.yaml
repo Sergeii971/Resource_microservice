@@ -25,7 +25,7 @@ spec:
           image: "{{ .Values.songService.image.repository }}:{{ .Values.songService.image.tag }}"
           imagePullPolicy: {{ .Values.songService.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.songService.service.port }}
+            - containerPort: {{ .Values.songService.service.targetPort }}
               protocol: TCP
           envFrom:
             - configMapRef:
@@ -35,7 +35,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.songService.service.port }}
+              port: {{ .Values.songService.service.targetPort }}
             initialDelaySeconds: 400
             timeoutSeconds: 50
             periodSeconds: 50
@@ -43,7 +43,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: {{ .Values.songService.service.port }}
+              port: {{ .Values.songService.service.targetPort }}
             initialDelaySeconds: 400
             timeoutSeconds: 50
             periodSeconds: 50

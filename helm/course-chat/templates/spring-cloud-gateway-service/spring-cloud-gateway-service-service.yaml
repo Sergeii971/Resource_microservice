@@ -10,4 +10,4 @@ spec:
   ports:
     - protocol: TCP
       port: {{ .Values.springCloudGatewayService.service.port }}
-      targetPort: {{ .Values.springCloudGatewayService.service.port }}
+      targetPort: {{ .Values.springCloudGatewayService.service.targetPort }}

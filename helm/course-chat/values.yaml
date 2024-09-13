@@ -1,3 +1,5 @@
+namespace: ingress
+
 authorizationService:
   replicaCount: 1
   image:
@@ -5,8 +7,9 @@ authorizationService:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8086
+    targetPort: 8086
 
 elasticsearch:
   replicaCount: 1
@@ -15,8 +18,9 @@ elasticsearch:
     tag: "8.7.0"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 9200
+    targetPort: 9200
 
 kafka:
   replicaCount: 1
@@ -25,8 +29,9 @@ kafka:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 9092
+    targetPort: 9092
 
 kibana:
   replicaCount: 1
@@ -35,8 +40,9 @@ kibana:
     tag: "8.7.0"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 5601
+    targetPort: 5601
 
 localstack:
   replicaCount: 1
@@ -45,8 +51,9 @@ localstack:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 4566
+    targetPort: 4566
 
 logstash:
   replicaCount: 1
@@ -55,8 +62,9 @@ logstash:
     tag: "8.7.0"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 9600
+    targetPort: 9600
 
 resourceProcessor:
   replicaCount: 1
@@ -65,8 +73,9 @@ resourceProcessor:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8083
+    targetPort: 8083
 
 resourceService:
   replicaCount: 1
@@ -75,8 +84,9 @@ resourceService:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8081
+    targetPort: 8081
 
 resourceServiceDb:
   replicaCount: 1
@@ -85,8 +95,9 @@ resourceServiceDb:
     tag: "14-alpine3.14"
     pullPolicy: IfNotPresent
   service:
-    clusterIP: None
+    type: ClusterIP
     port: 5432
+    targetPort: 5432
 
 serviceConfiguration:
   replicaCount: 1
@@ -95,8 +106,9 @@ serviceConfiguration:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8888
+    targetPort: 8888
 
 serviceDiscovery:
   replicaCount: 1
@@ -105,8 +117,9 @@ serviceDiscovery:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8761
+    targetPort: 8761
 
 
 songService:
@@ -116,8 +129,9 @@ songService:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8082
+    targetPort: 8082
 
 songServiceDb:
   replicaCount: 1
@@ -126,8 +140,9 @@ songServiceDb:
     tag: "14-alpine3.14"
     pullPolicy: IfNotPresent
   service:
-    clusterIP: None
+    type: ClusterIP
     port: 5432
+    targetPort: 5432
 
 springCloudGatewayService:
   replicaCount: 1
@@ -136,8 +151,9 @@ springCloudGatewayService:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8084
+    targetPort: 8084
 
 storageManager:
   replicaCount: 1
@@ -146,8 +162,9 @@ storageManager:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8085
+    targetPort: 8085
 
 storageManagerDb:
   replicaCount: 1
@@ -156,8 +173,9 @@ storageManagerDb:
     tag: "14-alpine3.14"
     pullPolicy: IfNotPresent
   service:
-    clusterIP: None
+    type: ClusterIP
     port: 5432
+    targetPort: 5432
 
 
 zookeeper:
@@ -167,8 +185,96 @@ zookeeper:
     tag: "latest"
     pullPolicy: IfNotPresent
   service:
-    clusterIP: None
+    type: ClusterIP
     port: 2181
+    targetPort: 2181
 
-namespace: course
-
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: "localhost"
+      paths:
+        - path: /api/auth
+          pathType: Prefix
+          backend:
+            serviceName: "authorization-service"
+            servicePort: 8086
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "elasticsearch"
+            servicePort: 9200
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "kibana"
+            servicePort: 5601
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "localstack"
+            servicePort: 4566
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "logstash"
+            servicePort: 9600
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "resource-processor"
+            servicePort: 8083
+    - host: "localhost"
+      paths:
+        - path: /v1/resources
+          pathType: Prefix
+          backend:
+            serviceName: "resource-service"
+            servicePort: 8081
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "service-configuration"
+            servicePort: 8888
+    - host: "localhost"
+      paths:
+        - path: /eureka
+          pathType: Prefix
+          backend:
+            serviceName: "service-discovery"
+            servicePort: 8761
+    - host: "localhost"
+      paths:
+        - path: /v1/songs
+          pathType: Prefix
+          backend:
+            serviceName: "song-service"
+            servicePort: 8082
+    - host: "localhost"
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: "spring-cloud-gateway-service"
+            servicePort: 8084
+    - host: "localhost"
+      paths:
+        - path: /v1/storages
+          pathType: Prefix
+          backend:
+            serviceName: "storage-manager"
+            servicePort: 8085

@@ -5,9 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - protocol: TCP
+    - name: "kafka-port"
       port: {{ .Values.kafka.service.port }}
-      targetPort: {{ .Values.kafka.service.port }}
+      targetPort: {{ .Values.kafka.service.targetPort }}
   type: {{ .Values.kafka.service.type }}
   selector:
     app: kafka

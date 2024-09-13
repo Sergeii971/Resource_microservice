@@ -22,7 +22,7 @@ spec:
           image: "{{ .Values.storageManagerDb.image.repository }}:{{ .Values.storageManagerDb.image.tag }}"
           imagePullPolicy: {{ .Values.storageManagerDb.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.storageManagerDb.service.port }}
+            - containerPort: {{ .Values.storageManagerDb.service.targetPort }}
               protocol: TCP
           envFrom:
             - secretRef:

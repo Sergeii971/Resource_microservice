@@ -7,7 +7,7 @@ spec:
   ports:
     - protocol: TCP
       port: {{ .Values.kibana.service.port }}
-      targetPort: {{ .Values.kibana.service.port }}
+      targetPort: {{ .Values.kibana.service.targetPort }}
   type: {{ .Values.kibana.service.type }}
   selector:
     app: kibana

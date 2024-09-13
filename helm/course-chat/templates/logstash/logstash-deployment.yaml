@@ -21,7 +21,7 @@ spec:
           image: "{{ .Values.logstash.image.repository }}:{{ .Values.logstash.image.tag }}"
           imagePullPolicy: {{ .Values.logstash.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.logstash.service.port }}
+            - containerPort: {{ .Values.logstash.service.targetPort }}
               protocol: TCP
           volumeMounts:
             - name: logstash-config-volume

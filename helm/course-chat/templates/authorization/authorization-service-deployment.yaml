@@ -28,6 +28,6 @@ spec:
             - configMapRef:
                 name: authorization-service-config
           ports:
-            - containerPort: {{ .Values.authorizationService.service.port }}
+            - containerPort: {{ .Values.authorizationService.service.targetPort }}
               protocol: TCP
 

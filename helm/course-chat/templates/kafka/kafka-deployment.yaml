@@ -24,4 +24,4 @@ spec:
             - configMapRef:
                 name: kafka-config
           ports:
-            - containerPort: {{ .Values.kafka.service.port }}
+            - containerPort: {{ .Values.kafka.service.targetPort }}

@@ -5,9 +5,10 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - protocol: TCP
+    - name: "resource-service-db-port"
+      protocol: TCP
       port: {{ .Values.resourceServiceDb.service.port }}
-      targetPort: {{ .Values.resourceServiceDb.service.port }}
-  clusterIP: {{ .Values.resourceServiceDb.service.clusterIP }}
+      targetPort: {{ .Values.resourceServiceDb.service.targetPort }}
+  type: {{ .Values.resourceServiceDb.service.clusterIP }}
   selector:
     app: resource-service-db

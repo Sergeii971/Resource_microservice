@@ -7,7 +7,7 @@ spec:
   ports:
     - protocol: TCP
       port: {{ .Values.serviceConfiguration.service.port }}
-      targetPort: {{ .Values.serviceConfiguration.service.port }}
+      targetPort: {{ .Values.serviceConfiguration.service.targetPort }}
   type: {{ .Values.serviceConfiguration.service.type }}
   selector:
     app: service-configuration
